@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sri_brijraj_web/constants/color_constants.dart';
 import 'package:sri_brijraj_web/features/profile/controllers/profile_controller.dart';
+import 'package:sri_brijraj_web/features/reports/screens/report_filter_screen.dart';
 import 'package:sri_brijraj_web/features/reset_password/screens/reset_password_screen.dart';
 import 'package:sri_brijraj_web/styles/textstyles.dart';
 import 'package:sri_brijraj_web/widgets/app_button.dart';
@@ -59,7 +60,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               AppSpaces.v50,
               AppButton(
-                onPressed: () {},
+                onPressed: () {
+                  Get.to(
+                    () => ReportFilterScreen(),
+                  );
+                },
                 buttonHeight: 50,
                 buttonWidth: 0.4.screenWidth,
                 title: 'Download Report',

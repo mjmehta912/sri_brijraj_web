@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart'; // Import for kIsWeb
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sri_brijraj_web/features/history/models/history_model_dm.dart';
 import 'package:sri_brijraj_web/features/history/screens/pdf_screen.dart';
 import 'package:sri_brijraj_web/features/history/services/history_api_service.dart';
 import 'package:sri_brijraj_web/utils/alert_message_utils.dart';
+import 'package:sri_brijraj_web/utils/web_utils.dart'; // Helper for Web PDF
 
 class HistoryController extends GetxController {
   var isLoading = false.obs;
@@ -16,15 +18,14 @@ class HistoryController extends GetxController {
   var searchQuery = ''.obs;
   var historyList = <HistoryModelDm>[].obs;
 
-  final ScrollController scrollController =
-      ScrollController(); // Add scroll controller
+  final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
     super.onInit();
     fetchSlipHistory();
     debounceSearchQuery();
-    scrollController.addListener(_scrollListener); // Attach scroll listener
+    scrollController.addListener(_scrollListener);
   }
 
   void debounceSearchQuery() {
@@ -38,14 +39,14 @@ class HistoryController extends GetxController {
   void _scrollListener() {
     if (scrollController.position.pixels >=
         scrollController.position.maxScrollExtent - 200) {
-      fetchSlipHistory(loadMore: true); // Fetch more when reaching near bottom
+      fetchSlipHistory(loadMore: true);
     }
   }
 
   var isFetchingData = false;
 
   Future<void> fetchSlipHistory({bool loadMore = false}) async {
-    if (isFetchingData) return; // Prevent duplicate calls
+    if (isFetchingData) return;
     if (loadMore && !hasMoreData.value) return;
 
     try {
@@ -85,8 +86,15 @@ class HistoryController extends GetxController {
     try {
       isLoading.value = true;
       final pdfBytes = await HistoryService.downloadSlip(slipNo: slipNo);
+
       if (pdfBytes != null && pdfBytes.isNotEmpty) {
-        Get.to(() => PdfScreen(pdfBytes: pdfBytes, title: slipNo));
+        if (kIsWeb) {
+          // **Web: Convert to Blob URL and Open**
+          WebUtils.openPdfInNewTab(pdfBytes);
+        } else {
+          // **Mobile: Navigate to PdfScreen**
+          Get.to(() => PdfScreen(pdfBytes: pdfBytes, title: slipNo));
+        }
       }
     } catch (e) {
       showErrorDialog('Error', e.toString());
